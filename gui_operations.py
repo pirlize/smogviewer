@@ -7,6 +7,20 @@ from tkinter import ttk
 from db_operations import read_from_db
 from ttkthemes import ThemedTk
 
+parameter_ids = {
+    'O_3': 3, 
+    'Environment Temperature': 4,  
+    'Humidity': 5,  
+    'Sensor Node Battery': 6, 
+    'PM 1.0': 8, 
+    'PM 2.5': 9, 
+    'PM 10': 10,  
+    'SO_2': 11, 
+    'NO': 12,  
+    'NO_2': 13, 
+    'Pressure': 14
+}
+
 def create_window(window_title):
     root = ThemedTk(theme="arc")  # arc is a nice clean theme
     root.title(window_title)
@@ -59,7 +73,8 @@ def update_labels(root, labels, parameters, conn, current_data_iter, table_name)
         pd.DataFrame([record]).to_sql(table_name, conn, if_exists='append', index=False)
     except StopIteration:
         pass
-    for id, parameter in enumerate(parameters.keys(), start=3):
+    for parameter in parameters.keys():
+        id = parameter_ids[parameter]
         df_from_db = read_from_db(f'SELECT * FROM measurements WHERE sensor_type_id={id} ORDER BY timestamp DESC LIMIT 1', conn)
         if not df_from_db.empty:
             value = df_from_db['value'].values[0]
